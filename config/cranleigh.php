@@ -1,0 +1,43 @@
+<?php
+
+return [
+    'categories' => [
+        'football',
+        'athletics',
+        'climbing',
+        'badminton',
+        'cricket',
+        'crosscountry',
+        'fives',
+        'golf',
+        'hockey',
+        'netball',
+        'riding',
+        'rounders',
+        'rugby',
+        'swimming',
+        'squash',
+        'tennis',
+        'waterpolo',
+        'art',
+        'biology',
+        'businessstudies',
+        'chemistry',
+        'classics',
+        'design',
+        'computingdigitalliteracy',
+        'drama',
+        'economics',
+        'english',
+        'geography',
+        'history',
+        'mathematics',
+        'modernlanguages',
+        'music',
+        'physicaleducation',
+        'physics',
+        'politics',
+        'pshee',
+        'religionphilosophy'
+    ]
+];
