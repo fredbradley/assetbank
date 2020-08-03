@@ -181,6 +181,7 @@ class AssetBankController extends Controller
     {
         if ($new === true) {
             $response = $this->newApi("assets/" . $id);
+            
         } else {
             $response = $this->api("assets/" . $id . "");
         }
@@ -202,7 +203,10 @@ class AssetBankController extends Controller
             $query = null;
         }
 
-        $response = Http::get($endpoint . $query);
+        $response = Http::withHeaders([
+            'Accept' => 'application/json',
+            'Content-Type' => 'application/json',
+        ])->get("https://photos.cranleigh.org/asset-bank/rest/" . $endpoint . $query);
         return $response->object();
 
     }
