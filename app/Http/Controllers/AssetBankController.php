@@ -2,17 +2,30 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 use GuzzleHttp\Client as Guzzle;
 use App\Http\Asset;
 use Illuminate\Support\Facades\Http;
 
+/**
+ * Class AssetBankController
+ * @package App\Http\Controllers
+ */
 class AssetBankController extends Controller
 {
+    /**
+     * @var string
+     */
     private $root_url = "https://photos.cranleigh.org/asset-bank/rest/";
 
+    /**
+     * @var array
+     */
     protected $guzzleOpts = [];
 
+    /**
+     * AssetBankController constructor.
+     */
     public function __construct()
     {
         $this->guzzle = new Guzzle([
@@ -24,6 +37,11 @@ class AssetBankController extends Controller
         ]);
     }
 
+    /**
+     * @param array|null $vars
+     *
+     * @return array
+     */
     protected function guzzleOpts(array $vars = null)
     {
         if ($vars !== null) :
@@ -34,6 +52,13 @@ class AssetBankController extends Controller
         return $this->guzzleOpts;
     }
 
+    /**
+     * @param      $id
+     * @param bool $raw
+     *
+     * @return \App\Http\Asset|\Illuminate\Http\JsonResponse
+     * @throws \Exception
+     */
     public function getAssetInfoForWebsite($id, $raw = false)
     {
 
@@ -58,7 +83,12 @@ class AssetBankController extends Controller
         }
     }
 
-    private function websiteCriteriaCheck(Asset $asset)
+    /**
+     * @param \App\Http\Asset $asset
+     *
+     * @return bool
+     */
+    private function websiteCriteriaCheck(Asset $asset): bool
     {
         if (in_array("Exclude DSignage", $asset->tags)) {
             return false;
@@ -72,7 +102,11 @@ class AssetBankController extends Controller
     }
 
 
-    private function setReadableAttributes(Asset $asset, $attributes)
+    /**
+     * @param \App\Http\Asset $asset
+     * @param                 $attributes
+     */
+    private function setReadableAttributes(Asset $asset, $attributes): void
     {
 
         foreach ($attributes as $attribute) {
@@ -125,12 +159,24 @@ class AssetBankController extends Controller
         } // End foreach
     }
 
+    /**
+     * @param $tags
+     *
+     * @return array
+     */
     private function simplify_tag_list($tags)
     {
 
         return array_values(array_unique($tags));
     }
 
+    /**
+     * @param      $id
+     * @param bool $new
+     *
+     * @return \Illuminate\Http\JsonResponse
+     * @throws \Exception
+     */
     public function getAssetByID($id, $new = false)
     {
         if ($new === true) {
@@ -138,9 +184,16 @@ class AssetBankController extends Controller
         } else {
             $response = $this->api("assets/" . $id . "");
         }
+        return new \App\Http\Resources\Asset($response);
         return response()->json($response);
     }
 
+    /**
+     * @param       $endpoint
+     * @param array $options
+     *
+     * @return object
+     */
     public function newApi($endpoint, $options = [])
     {
         if (! empty($options)) {
@@ -154,6 +207,13 @@ class AssetBankController extends Controller
 
     }
 
+    /**
+     * @param       $endpoint
+     * @param array $options
+     *
+     * @return mixed
+     * @throws \Exception
+     */
     public function api($endpoint, $options = [])
     {
         if (! empty($options)) {
@@ -176,7 +236,13 @@ class AssetBankController extends Controller
         return json_decode($response->getBody(), true);
     }
 
-    public function relatedImages($id)
+    /**
+     * @param $id
+     *
+     * @return \Illuminate\Http\JsonResponse
+     * @throws \Exception
+     */
+    public function relatedImages($id): JsonResponse
     {
         $asset = $this->getAssetInfoForWebsite($id, true);
 
@@ -185,6 +251,14 @@ class AssetBankController extends Controller
         return response()->json($asset);
     }
 
+    /**
+     * @param             $searchTerm
+     * @param string|null $exclude
+     * @param bool        $raw
+     *
+     * @return \Illuminate\Http\JsonResponse|\stdClass
+     * @throws \Exception
+     */
     public function relatedEvents($searchTerm, string $exclude = null, $raw = false)
     {
         if ($exclude !== null) {
@@ -223,7 +297,10 @@ class AssetBankController extends Controller
         }
     }
 
-    public function getAttributes()
+    /**
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getAttributes(): JsonResponse
     {
         $xml = $this->get("attributes");
         return response()->json($this->result);
@@ -258,7 +335,11 @@ class AssetBankController extends Controller
         return response()->json($this->result);
     }
 
-    public function newGetCategories()
+    /**
+     * @return array
+     * @throws \Exception
+     */
+    public function newGetCategories(): array
     {
         $categoryTree = $this->api("category-search");
         $cats = [];
@@ -278,7 +359,10 @@ class AssetBankController extends Controller
         return $cats;
     }
 
-    public function get_categories()
+    /**
+     * @return array|void
+     */
+    public function get_categories(): array
     {
         $this->get("category-search");
         $cats = [];
@@ -305,9 +389,9 @@ class AssetBankController extends Controller
      *
      * @param mixed $object
      *
-     * @return void
+     * @return array
      */
-    public function loop($object)
+    public function loop($object): array
     {
         $output = [];
         $loop = [];
@@ -322,7 +406,11 @@ class AssetBankController extends Controller
         return $output;
     }
 
-    public function listAssetBankCategories()
+    /**
+     * @return \Illuminate\Http\JsonResponse
+     * @throws \Exception
+     */
+    public function listAssetBankCategories(): JsonResponse
     {
         return $this->newGetCategories();
         $categories = $this->get_categories();
@@ -332,6 +420,10 @@ class AssetBankController extends Controller
     }
 
 
+    /**
+     * @param       $endpoint
+     * @param array $options
+     */
     public function get($endpoint, $options = [])
     {
         if (! empty($options)) {
