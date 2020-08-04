@@ -180,14 +180,8 @@ class AssetBankController extends Controller
     public function getAssetByID($id, $new = false)
     {
         $response = $this->newApi("assets/" . $id);
-
-//        if ($new === true) {
-//            $response = $this->newApi("assets/" . $id);
-//        } else {
-//            $response = $this->api("assets/" . $id . "");
-//        }
+        
         return new \App\Http\Resources\Asset($response);
-        return response()->json($response);
     }
 
     /**
