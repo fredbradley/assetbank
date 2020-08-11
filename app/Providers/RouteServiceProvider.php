@@ -46,9 +46,15 @@ class RouteServiceProvider extends ServiceProvider
 
         $this->mapWebRoutes();
 
-        //
+        $this->mapDigitalSignageRoutes();
     }
 
+    protected function mapDigitalSignageRoutes() {
+        Route::middleware('web')
+            ->namespace($this->namespace)
+            ->prefix("dsm")
+            ->group(base_path('routes/digital-signage.php'));
+    }
     /**
      * Define the "web" routes for the application.
      *
