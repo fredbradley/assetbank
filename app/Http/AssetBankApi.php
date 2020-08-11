@@ -29,6 +29,11 @@ class AssetBankApi
         ]);
     }
 
+    public function get(string $endpoint, array $options = [])
+    {
+        return $this->request("GET", $endpoint, $options);
+    }
+
     /**
      * @param string $method
      * @param string $endpoint
@@ -36,7 +41,7 @@ class AssetBankApi
      *
      * @return object
      */
-    public function request(string $method = 'GET', string $endpoint, $options = [])
+    public function request(string $method, string $endpoint, $options = [])
     {
         $method = strtoupper($method);
         $response = Http::withHeaders([
