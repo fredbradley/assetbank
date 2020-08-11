@@ -19,7 +19,7 @@ Route::get('nagioscheck', function () {
 Route::get('/', function () {
     return view('welcome');
 });
-
+Route::get('ds', 'DigitalSignageController@test');
 Route::get('asset/{id}', 'AssetBankController@getAssetByID');
 Route::get('group/{id}', 'AssetBankController@get_recent_photos_from_group');
 Route::get('list-categories', 'AssetBankController@listAssetBankCategories');
