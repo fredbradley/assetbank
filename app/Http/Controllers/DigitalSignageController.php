@@ -15,12 +15,6 @@ class DigitalSignageController extends Controller
         $this->assetBank = $assetBank;
     }
 
-    public function test()
-    {
-//        dd($this->assetBank->guzzle->get("assets/8124"));
-        dd($this->assetBank->request("GET", "assets/8124"));
-    }
-
     public function setupSenior()
     {
         //
@@ -60,14 +54,14 @@ class DigitalSignageController extends Controller
         $options = [
             'attribute_701' => 'Senior',
             'attribute_709' => 'Best',
-            'pageSize' => 100,
+            'pageSize' => 1,
             'sortAttributeId' => 7,
             'sortDescending' => 'true',
             'includeImplicitCategoryMembers' => 'false',
             'orientation' => 1,
         ];
 
-        return $this->assetBank->get('assets/asset-search?'.$this->getQueryString($incCats, $options));
+        return $this->assetBank->get('asset-search?'.$this->getQueryString($incCats, $options));
 
     }
 

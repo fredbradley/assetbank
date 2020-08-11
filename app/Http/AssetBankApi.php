@@ -60,6 +60,7 @@ class AssetBankApi
                 break;
         }
 
+$response->throw();
 
         return $response->object();
 
