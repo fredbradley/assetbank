@@ -21,7 +21,7 @@ class SmugMugController extends Controller
             $smugNickname = "cranleigh";
         }
 
-        $this->smugmug = (new SmugMugApi($smugNickname . '.json'));
+        $this->smugmug = (new SmugMugApi('smug_'.$smugNickname . '.json'));
     }
 
     public function getHouseAlbumsOrFolders(string $house)
