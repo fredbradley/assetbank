@@ -1,6 +1,16 @@
 <?php
 
 return [
+    'houses' => [
+        'Cubitt',
+        'South',
+        'Loveday',
+        'Rhodes',
+        'North',
+        'West',
+        'East',
+        'Martlet',
+    ],
     'categories' => [
         'football',
         'athletics',
@@ -38,6 +48,6 @@ return [
         'physics',
         'politics',
         'pshee',
-        'religionphilosophy'
-    ]
+        'religionphilosophy',
+    ],
 ];

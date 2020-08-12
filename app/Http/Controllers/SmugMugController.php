@@ -2,48 +2,57 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\SmugMugApi;
 use Illuminate\Http\Request;
-use phpSmug;
-use stdClass;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Route;
 
 class SmugMugController extends Controller
 {
-    //
-//    public $api_key='lKDuCaYbAGRdkTgnhbbLcgCK7EddinlQ';
-    public $api_key='Z7C8b59zBfhwfbDbVjNwKLxRzz5BLqdZ';
-    public $options=['AppName' => 'Cranleigh AssetBankAPI/1.0 (https://assetbankapi.cranleigh.org)', '_shorturis' => false];
-    public $username = 'cranleigh';
 
-	private function smugmugSettings() {
-		return [
-			"cranleigh" => [],
-			"cranprep" => [
-				"api_key" => "Z7C8b59zBfhwfbDbVjNwKLxRzz5BLqdZ",
-				"oauth_token" => "mGw3w9svH9dmGgnDvmm2Wc7zR9STZdf3",
-				"oauth_verifier" => "793196"
-			]
-		];
-	}
-    public function __construct() {
-	    $this->smug = new phpSmug\Client($this->api_key, $this->options);
-	    $this->smug->oauth_token = 'jvNtTxvfHG8nkDS94z2dgMtsr8rQk95B';
-	    $this->smug->oauth_token_secret = 'BkDLTSjH9pvWVJMfRNGTzPstr3dnMX2qnzbthfVKsDW3d73vrLLZfFgSZg5Xgq5M';
-    }
-    public function test() {
-	    $this->smug = new phpSmug\Client($this->api_key, $this->options);
-	    $repositories = $this->smug->get('user/cranleigh!albums');
-	    $result = new stdClass;
-	    $result->result = $repositories;
-//	    var_dump($repositories);
-		return response()->json($result);
-    }
-    
-    public function base($username, $endpoint) {
-	    $repositories = $this->smug->get('api/v2/user/'.$username.'!'.$endpoint);
-		$result = new stdClass;
-	    $result->result = $repositories;
-	    $result->oauth = $this->smug->oauth_token_secret;
+    /**
+     * SmugMugController constructor.
+     */
+    public function __construct(Request $request)
+    {
+        $smugNickname = $request->get('username');
+        if ($smugNickname === null) {
+            $smugNickname = "cranleigh";
+        }
 
-		return response()->json($result);
+        $this->smugmug = (new SmugMugApi($smugNickname . '.json'));
+    }
+
+    public function getHouseAlbumsOrFolders(string $house)
+    {
+        return Cache::remember("smug_house_children_nodes_" . $house, now()->addMinutes(15), function () use ($house) {
+            $house = ucfirst($house); // Sanitize, just in case
+
+            $houseNodeChildren = $this->smugmug->getHouseNodeChildren($house);
+            $houseFolder = $this->smugmug->getHouseFolder($house);
+            $nodes = [];
+            try {
+                foreach ($houseNodeChildren->Node as $node) {
+                    $nodes[] = [
+                        'type' => $node->Type,
+                        'title' => $node->Name,
+                        'uri' => $node->WebUri,
+                        'thumb' => $this->smugmug->client->get($node->Uris->NodeCoverImage)->Image->ThumbnailUrl,
+                    ];
+                }
+
+            } catch (\ErrorException $exception) {
+                Log::error($exception->getMessage());
+            }
+            $houseFolder->children = $nodes;
+
+            $response = [
+                'name' => $houseFolder->Folder->Name,
+                'uri' => $houseFolder->Folder->WebUri,
+                'children' => $nodes,
+            ];
+            return response()->json($response);
+        });
     }
 }

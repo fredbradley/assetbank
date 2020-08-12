@@ -70,5 +70,6 @@ Route::group(['prefix' => 'database'], function () {
 */
 
 Route::group(['prefix' => 'smugmug'], function () {
-    Route::get('{username}/{endpoint}', 'SmugMugController@base');
+    Route::get('{house}', 'SmugMugController@getHouseAlbumsOrFolders');
+   // Route::get('{username}/{endpoint}', 'SmugMugController@base');
 });
